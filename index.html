@@ -549,9 +549,9 @@ function bdgHTML(r){
 function repHTML(r,avg){
   const loq=getLOQ(),lod=getLOD();
   if(!r)return`<div class="reprow"><div class="reptag"><i class="ti ti-clipboard-text"></i>ข้อความรายงาน</div><div class="repval e">รอกรอกค่าทั้ง 2 หลุม</div></div>`;
-  if(r.t==='nd')return`<div class="reprow"><div class="reptag"><i class="ti ti-clipboard-check"></i>ข้อความรายงาน</div><div class="repval">Not Detected</div><div class="repunit">รายงานว่าตรวจไม่พบ Aflatoxin (ต่ำกว่าค่า LOD = ${lod} ng/g)</div></div>`;
-  if(r.t==='lt')return`<div class="reprow"><div class="reptag"><i class="ti ti-clipboard-check"></i>ข้อความรายงาน</div><div class="repval">Less Than ${loq.toFixed(1)} ng/g</div><div class="repunit">รายงานว่าปริมาณ Aflatoxin น้อยกว่า ${loq.toFixed(1)} ng/g (ค่าอยู่ระหว่าง LOD–LOQ)</div></div>`;
-  return`<div class="reprow"><div class="reptag"><i class="ti ti-clipboard-check"></i>ข้อความรายงาน</div><div class="repval">${avg.toFixed(1)} ng/g</div><div class="repunit">รายงานค่าที่ได้จากการทดสอบ = ${avg.toFixed(1)} ng/g (${avg.toFixed(1)} ppb) — ค่าเกิน LOQ</div></div>`;
+  if(r.t==='nd')return`<div class="reprow rep-nd"><div class="reptag"><i class="ti ti-circle-check"></i>ข้อความรายงาน</div><div class="repval">Not Detected</div><div class="repunit">รายงานว่าตรวจไม่พบ Aflatoxin (ต่ำกว่าค่า LOD = ${lod} ng/g)</div></div>`;
+  if(r.t==='lt')return`<div class="reprow rep-lt"><div class="reptag"><i class="ti ti-alert-triangle"></i>ข้อความรายงาน</div><div class="repval">Less Than ${loq.toFixed(1)} ng/g</div><div class="repunit">รายงานว่าปริมาณ Aflatoxin น้อยกว่า ${loq.toFixed(1)} ng/g (ค่าอยู่ระหว่าง LOD–LOQ)</div></div>`;
+  return`<div class="reprow rep-dt"><div class="reptag"><i class="ti ti-alert-circle"></i>ข้อความรายงาน</div><div class="repval">${avg.toFixed(1)} ng/g</div><div class="repunit">รายงานค่าที่ได้จากการทดสอบ = ${avg.toFixed(1)} ng/g (${avg.toFixed(1)} ppb) — ค่าเกิน LOQ</div></div>`;
 }
 
 function addStd(){
