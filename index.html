@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aflatoxin Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --teal:#2E9E8E;--teal2:#1B7A6D;--teal-l:#E8F8F5;--teal-m:#7EC8BE;
+  --bg:#F0F4F8;
+  --white:#FFFFFF;
+  --ink:#1E2A35;--ink2:#4B5C6B;--ink3:#9BAAB8;
+  --border:#DDE5ED;
+  --green:#34A853;--green-bg:#EBF8EE;--green-b:#A8DAB5;
+  --amber:#E09B2D;--amber-bg:#FEF7E8;--amber-b:#F5D08A;
+  --red:#E05252;--red-bg:#FEF0F0;--red-b:#F5AAAA;
+  --blue:#3A7BD5;--blue-bg:#EBF2FC;--blue-b:#9EC3F0;
+  --purple:#8B5CF6;--purple-bg:#F3EFFE;--purple-b:#C4B0F7;
+  --r:16px;--r2:12px;--r3:8px;
+  --font:'Prompt',sans-serif;--mono:'Space Mono',monospace;
+  --card-w:520px;
+  --shadow:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.04);
+  --shadow-sm:0 1px 4px rgba(0,0,0,.06);
+}
+html{background:var(--bg);min-height:100%;}
+body{font-family:var(--font);color:var(--ink);font-size:14px;-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;align-items:center;min-height:100vh;
+  padding:0 0 48px;background:var(--bg);}
+
+/* ── CARD WRAPPER ── */
+.app{width:100%;max-width:var(--card-w);padding:0 16px;}
+
+/* ── HEADER CARD ── */
+.hdr-card{
+  background:linear-gradient(135deg,#2E9E8E 0%,#1B7A6D 60%,#166059 100%);
+  border-radius:0 0 24px 24px;
+  padding:20px 20px 24px;
+  margin-bottom:16px;
+  position:relative;overflow:hidden;
+  width:100%;max-width:var(--card-w);
+  align-self:center;
+}
+.hdr-card::after{
+  content:'';position:absolute;right:-30px;top:-30px;
+  width:140px;height:140px;border-radius:50%;
+  background:rgba(255,255,255,.07);pointer-events:none;
+}
+.hdr-card::before{
+  content:'';position:absolute;right:30px;bottom:-40px;
+  width:100px;height:100px;border-radius:50%;
+  background:rgba(255,255,255,.05);pointer-events:none;
+}
+.hdr-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.hdr-logo{
+  width:40px;height:40px;border-radius:12px;
+  background:rgba(255,255,255,.18);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.hdr-text h1{color:#fff;font-size:17px;font-weight:700;letter-spacing:-.2px;}
+.hdr-text p{color:rgba(255,255,255,.65);font-size:11px;margin-top:1px;}
+.lod-row{display:flex;gap:8px;}
+.lod-chip{
+  flex:1;display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);
+  border-radius:10px;padding:8px 12px;
+}
+.lod-chip label{font-size:10px;font-weight:600;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap;display:flex;align-items:center;gap:4px;}
+.lod-chip label i{font-size:13px;}
+.lod-chip input{background:rgba(255,255,255,.15);border:none;outline:none;font-family:var(--mono);font-size:17px;font-weight:700;color:#fff;text-align:center;width:52px;border-radius:7px;padding:4px 6px;-moz-appearance:textfield;} 
+.lod-chip span{font-size:10px;color:rgba(255,255,255,.45);}
+
+#g-lod::-webkit-outer-spin-button,#g-lod::-webkit-inner-spin-button,#g-loq::-webkit-outer-spin-button,#g-loq::-webkit-inner-spin-button{-webkit-appearance:none;}
+#g-lod,#g-loq{-moz-appearance:textfield;}
+
+/* ── TABS ── */
+.tabs-card{
+  background:var(--white);border-radius:var(--r2);
+  box-shadow:var(--shadow-sm);border:1px solid var(--border);
+  display:flex;margin-bottom:14px;overflow:hidden;
+}
+.tbtn{
+  flex:1;padding:12px 8px;border:none;background:transparent;
+  font-family:var(--font);font-size:13px;font-weight:600;
+  color:var(--ink3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  border-bottom:3px solid transparent;transition:all .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.tbtn i{font-size:16px;}
+.tbtn.on{color:var(--teal);border-bottom-color:var(--teal);background:var(--teal-l);}
+
+/* ── PANEL ── */
+.panel{display:none;flex-direction:column;gap:10px;}
+.panel.on{display:flex;}
+
+/* ── HINT ── */
+.hint{
+  background:var(--teal-l);border:1px solid #B2E0DA;
+  border-radius:var(--r3);padding:10px 14px;
+  font-size:12px;color:var(--teal2);line-height:1.6;
+  display:flex;gap:8px;align-items:flex-start;
+}
+.hint i{font-size:16px;flex-shrink:0;margin-top:1px;color:var(--teal);}
+
+/* ── SAMPLE CARD ── */
+.sc{
+  background:var(--white);border-radius:var(--r);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+  overflow:hidden;transition:border-color .2s,box-shadow .2s;
+}
+.sc:focus-within{border-color:var(--teal-m);box-shadow:0 0 0 3px rgba(46,158,142,.1);}
+
+.sc-bar{
+  background:linear-gradient(135deg,#D6F0EB 0%,#EBF8F5 60%,#F5FFFE 100%);
+  padding:10px 14px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid #B8E0D9;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 1px 3px rgba(46,158,142,.08);
+}
+.sc-num{
+  width:26px;height:26px;border-radius:7px;
+  background:var(--teal);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;font-weight:700;color:#fff;
+  flex-shrink:0;
+  box-shadow:0 0 0 3px rgba(46,158,142,.2),0 2px 6px rgba(46,158,142,.3);
+}
+.sc-id{
+  flex:1;background:transparent;border:none;outline:none;
+  font-family:var(--font);font-size:13px;font-weight:500;
+  color:var(--ink);
+}
+.sc-id::placeholder{color:var(--ink3);}
+.del{
+  width:28px;height:28px;border:none;background:rgba(0,0,0,.05);
+  border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--ink3);flex-shrink:0;-webkit-tap-highlight-color:transparent;
+  transition:all .15s;
+}
+.del:hover{background:var(--red-bg);color:var(--red);}
+.del i{font-size:15px;}
+
+/* ── WELLS ── */
+.ww{padding:14px 14px 12px;}
+.section-label{
+  font-size:10px;font-weight:600;color:var(--ink3);
+  text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;
+  display:flex;align-items:center;gap:5px;
+}
+.section-label i{font-size:13px;color:var(--teal);}
+.wr{display:flex;gap:8px;align-items:flex-end;}
+.wb{flex:1;}
+.wb label{
+  font-size:10px;color:var(--ink3);text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:3px;
+  margin-bottom:4px;
+}
+.wb label i{font-size:12px;}
+.wi{
+  width:100%;padding:13px 8px;
+  border:1.5px solid var(--border);border-radius:var(--r2);
+  font-family:var(--mono);font-size:22px;font-weight:700;
+  color:var(--ink);text-align:center;background:#FAFBFC;
+  outline:none;transition:all .2s;
+  -moz-appearance:textfield;
+}
+.wi::-webkit-outer-spin-button,.wi::-webkit-inner-spin-button{-webkit-appearance:none;}
+.wi:focus{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px rgba(46,158,142,.1);}
+.wi.fill{border-color:var(--teal-m);background:#fff;}
+.wplus{
+  display:flex;align-items:center;justify-content:center;
+  color:var(--ink3);font-size:18px;padding-bottom:8px;flex-shrink:0;
+  width:20px;
+}
+
+/* ── AVG + BADGE ROW ── */
+.rr{
+  border-top:1px solid var(--border);
+  padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:#FAFBFC;
+}
+.avg-block{display:flex;flex-direction:column;gap:2px;}
+.avg-lbl{
+  font-size:10px;font-weight:600;color:var(--ink3);
+  text-transform:uppercase;letter-spacing:.6px;
+  display:flex;align-items:center;gap:4px;
+}
+.avg-lbl i{font-size:13px;color:var(--teal);}
+.avg-val{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--ink);}
+
+/* ── BADGE ── */
+.rbdg{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 12px;border-radius:var(--r2);
+  border:1.5px solid transparent;min-width:130px;
+  transition:all .25s;
+}
+.rbdg i{font-size:18px;flex-shrink:0;}
+.rbdg-text{}
+.rbm{font-family:var(--mono);font-size:12px;font-weight:700;line-height:1.2;}
+.rbs{font-size:9px;opacity:.7;margin-top:1px;}
+.rbdg.e{background:#F5F7FA;border-color:var(--border);}
+.rbdg.e i,.rbdg.e .rbm,.rbdg.e .rbs{color:var(--ink3);}
+.rbdg.nd{background:var(--green-bg);border-color:var(--green-b);}
+.rbdg.nd i,.rbdg.nd .rbm,.rbdg.nd .rbs{color:var(--green);}
+.rbdg.lt{background:var(--amber-bg);border-color:var(--amber-b);}
+.rbdg.lt i,.rbdg.lt .rbm,.rbdg.lt .rbs{color:var(--amber);}
+.rbdg.dt{background:var(--red-bg);border-color:var(--red-b);}
+.rbdg.dt i,.rbdg.dt .rbm,.rbdg.dt .rbs{color:var(--red);}
+
+/* ── REPORT ROW ── */
+.reprow{
+  border-top:2px dashed #EBF0F5;
+  padding:10px 14px 13px;
+  background:var(--white);
+}
+.reptag{
+  font-size:10px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.7px;color:var(--teal2);
+  margin-bottom:5px;display:flex;align-items:center;gap:5px;
+}
+.reptag i{font-size:13px;}
+.repval{font-size:14px;font-weight:700;color:var(--ink);line-height:1.4;}
+.repval.e{color:var(--ink3);font-weight:400;font-style:italic;font-size:12px;}
+.repunit{font-size:11px;color:var(--ink2);margin-top:3px;line-height:1.5;}
+
+/* ── DUP CARD ── */
+.dc{
+  background:var(--white);border-radius:var(--r);
+  border:1px solid var(--border);box-shadow:var(--shadow-sm);
+  overflow:hidden;transition:border-color .2s,box-shadow .2s;
+}
+.dc:focus-within{border-color:var(--teal-m);box-shadow:0 0 0 3px rgba(46,158,142,.1);}
+.dc-bar{
+  background:linear-gradient(135deg,#CBE8F7 0%,#E2F2FB 60%,#F4FAFF 100%);
+  padding:10px 14px;display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid #B5D8EE;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 1px 3px rgba(58,123,213,.08);
+}
+.dtag{
+  font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  background:var(--teal);color:#fff;padding:2px 8px;border-radius:5px;
+  display:flex;align-items:center;gap:3px;
+}
+.dtag i{font-size:11px;}
+.ab-wrap{display:flex;border-bottom:1px solid var(--border);}
+.abh{flex:1;padding:12px 12px 10px;}
+.abh:first-child{border-right:1px solid var(--border);}
+.abhd{display:flex;align-items:center;gap:6px;margin-bottom:9px;}
+.abpill{
+  width:24px;height:24px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;
+}
+.abpill.a{background:var(--blue-bg);color:var(--blue);}
+.abpill.b{background:var(--purple-bg);color:var(--purple);}
+.ablbl{font-size:12px;font-weight:700;color:var(--ink2);}
+.abwells{display:flex;gap:5px;align-items:flex-end;}
+.abw{flex:1;}
+.abw label{font-size:9px;color:var(--ink3);text-align:center;display:block;margin-bottom:3px;}
+.abwi{
+  width:100%;padding:10px 4px;
+  border:1.5px solid var(--border);border-radius:9px;
+  font-family:var(--mono);font-size:17px;font-weight:700;
+  color:var(--ink);text-align:center;background:#FAFBFC;
+  outline:none;transition:all .2s;-moz-appearance:textfield;
+}
+.abwi::-webkit-outer-spin-button,.abwi::-webkit-inner-spin-button{-webkit-appearance:none;}
+.abwi:focus{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px rgba(46,158,142,.1);}
+.abwi.fill{border-color:var(--teal-m);background:#fff;}
+.abavg{
+  margin-top:8px;display:flex;align-items:center;justify-content:space-between;
+  background:#F4F7FA;border-radius:8px;padding:6px 9px;
+}
+.abavgl{font-size:9px;color:var(--ink3);display:flex;align-items:center;gap:3px;}
+.abavgl i{font-size:11px;}
+.abavgv{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink);}
+.qc-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;
+  background:#F0FBF8;
+  border-top:1.5px solid #C8EAE5;
+  border-radius:0 0 var(--r) var(--r);
+}
+.qc-label{
+  font-size:10px;font-weight:600;color:var(--teal2);
+  display:flex;align-items:center;gap:5px;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.qc-label i{font-size:13px;}
+.rpdc{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:12px;font-weight:700;}
+.rpdc.ok{color:var(--green);}
+.rpdc.fail{color:var(--red);}
+.rpdc.na{color:var(--ink3);}
+.rpdd{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.dfinal{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:12px 14px;background:var(--white);
+}
+.dfl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--teal2);display:flex;align-items:center;gap:4px;margin-bottom:3px;}
+.dfl i{font-size:12px;}
+.dfv{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--ink);}
+
+/* ── ADD BTN ── */
+.add-btn{
+  width:100%;padding:13px;border:2px dashed #C8D5E0;
+  border-radius:var(--r);background:transparent;
+  font-family:var(--font);font-size:13px;font-weight:600;
+  color:var(--ink3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  -webkit-tap-highlight-color:transparent;transition:all .2s;
+}
+.add-btn i{font-size:16px;}
+.add-btn:hover{background:var(--teal-l);border-color:var(--teal-m);color:var(--teal);}
+.add-btn:active{transform:scale(.98);}
+
+/* ── SUMMARY CARDS ── */
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.sum-card{
+  background:var(--white);border-radius:var(--r2);
+  border:1px solid var(--border);padding:12px 14px;
+  box-shadow:var(--shadow-sm);
+  display:flex;align-items:center;gap:10px;
+}
+.sum-icon{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.sum-card.tot .sum-icon{background:#EEF2F7;color:var(--ink2);}
+.sum-card.nd .sum-icon{background:var(--green-bg);color:var(--green);}
+.sum-card.lt .sum-icon{background:var(--amber-bg);color:var(--amber);}
+.sum-card.dt .sum-icon{background:var(--red-bg);color:var(--red);}
+.sum-n{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--ink);line-height:1;}
+.sum-l{font-size:10px;color:var(--ink3);margin-top:2px;}
+.sum-card.nd .sum-n{color:var(--green);}
+.sum-card.lt .sum-n{color:var(--amber);}
+.sum-card.dt .sum-n{color:var(--red);}
+
+/* ── EXPORT BTN ── */
+.exp-btn{
+  width:100%;padding:13px;border-radius:var(--r2);border:none;
+  background:var(--teal);color:#fff;
+  font-family:var(--font);font-size:14px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  -webkit-tap-highlight-color:transparent;
+  box-shadow:0 4px 12px rgba(46,158,142,.3);
+  transition:all .2s;letter-spacing:.2px;
+}
+.exp-btn i{font-size:17px;}
+.exp-btn:hover{background:var(--teal2);box-shadow:0 6px 16px rgba(46,158,142,.35);}
+.exp-btn:active{transform:scale(.98);}
+
+
+.btn-row{display:flex;gap:8px;}
+.btn-row .exp-btn{flex:1;}
+.clear-btn{
+  padding:13px 16px;border-radius:var(--r2);border:1.5px solid var(--red-b);
+  background:var(--red-bg);color:var(--red);
+  font-family:var(--font);font-size:14px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
+  -webkit-tap-highlight-color:transparent;
+  transition:all .2s;white-space:nowrap;
+}
+.clear-btn i{font-size:17px;}
+.clear-btn:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.clear-btn:active{transform:scale(.98);}
+/* ── SECTION DIV ── */
+.sec-div{
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:600;color:var(--ink3);
+  text-transform:uppercase;letter-spacing:.7px;
+  margin:4px 0 2px;
+}
+.sec-div i{font-size:14px;color:var(--teal);}
+.sec-div::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:#fff;padding:9px 20px;
+  border-radius:20px;font-size:13px;font-weight:600;
+  white-space:nowrap;pointer-events:none;opacity:0;transition:all .25s;z-index:999;
+  display:flex;align-items:center;gap:7px;
+}
+.toast i{font-size:15px;}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── SPACER ── */
+.space{height:12px;}
+</style>
+</head>
+<body>
+
+<!-- HEADER CARD (full width top) -->
+<div style="width:100%;max-width:var(--card-w);margin:0 auto;">
+  <div class="hdr-card">
+    <div class="hdr-top">
+      <div class="hdr-logo">🧪</div>
+      <div class="hdr-text">
+        <h1>Aflatoxin Calculator</h1>
+        <p>CPF Testing Lab · ELISA Method · LOD/LOQ Report</p>
+      </div>
+    </div>
+    <div class="lod-row">
+      <div class="lod-chip">
+        <label><i class="ti ti-trending-down"></i>LOD</label>
+        <button onclick="adj('g-lod',-0.1)" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:22px;height:22px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">‹</button><input type="number" id="g-lod" value="3" min="0" step="0.1" oninput="recalcAll()" style="background:rgba(255,255,255,.15);border:none;outline:none;font-family:Space Mono,monospace;font-size:17px;font-weight:700;color:#fff;text-align:center;width:48px;border-radius:7px;padding:4px 2px;-moz-appearance:textfield;"><button onclick="adj('g-lod',0.1)" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:22px;height:22px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">›</button>
+        <span>ng/g</span>
+      </div>
+      <div class="lod-chip">
+        <label><i class="ti ti-chart-line"></i>LOQ</label>
+        <button onclick="adj('g-loq',-0.1)" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:22px;height:22px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">‹</button><input type="number" id="g-loq" value="4" min="0" step="0.1" oninput="recalcAll()" style="background:rgba(255,255,255,.15);border:none;outline:none;font-family:Space Mono,monospace;font-size:17px;font-weight:700;color:#fff;text-align:center;width:48px;border-radius:7px;padding:4px 2px;-moz-appearance:textfield;"><button onclick="adj('g-loq',0.1)" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:22px;height:22px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">›</button>
+        <span>ng/g</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- TABS -->
+  <div class="tabs-card">
+    <button class="tbtn on" id="tb-dup" onclick="switchTab('dup')">
+      <i class="ti ti-copy"></i>Duplicate
+    </button>
+    <button class="tbtn" id="tb-std" onclick="switchTab('std')">
+      <i class="ti ti-flask"></i>ทดสอบปกติ
+    </button>
+  </div>
+
+  <!-- STD PANEL -->
+  <div class="panel" id="p-std">
+    <div class="hint">
+      <i class="ti ti-info-circle"></i>
+      <span>1 รหัส · 2 หลุม · เฉลี่ยอัตโนมัติ พร้อมแปลผลและข้อความรายงานตามเกณฑ์ LOD/LOQ</span>
+    </div>
+    <div id="std-list"></div>
+    <button class="add-btn" onclick="addStd()">
+      <i class="ti ti-circle-plus"></i>เพิ่มตัวอย่าง
+    </button>
+    <div class="space"></div>
+    <div class="sec-div"><i class="ti ti-chart-bar"></i>สรุปผล</div>
+    <div class="summary-grid">
+      <div class="sum-card tot"><div class="sum-icon"><i class="ti ti-test-pipe"></i></div><div><div class="sum-n" id="ss-tot">0</div><div class="sum-l">ทั้งหมด</div></div></div>
+      <div class="sum-card nd"><div class="sum-icon"><i class="ti ti-circle-check"></i></div><div><div class="sum-n" id="ss-nd">0</div><div class="sum-l">Not Detected</div></div></div>
+      <div class="sum-card lt"><div class="sum-icon"><i class="ti ti-alert-triangle"></i></div><div><div class="sum-n" id="ss-lt">0</div><div class="sum-l">Less Than</div></div></div>
+      <div class="sum-card dt"><div class="sum-icon"><i class="ti ti-alert-circle"></i></div><div><div class="sum-n" id="ss-dt">0</div><div class="sum-l">Detected</div></div></div>
+    </div>
+    <div class="btn-row">
+      <button class="clear-btn" onclick="clearAll('std')">
+        <i class="ti ti-trash-x"></i>เคลียร์ข้อมูล
+      </button>
+      <button class="exp-btn" onclick="exportCSV('std')">
+        <i class="ti ti-download"></i>Export CSV
+      </button>
+    </div>
+  </div>
+
+  <!-- DUP PANEL -->
+  <div class="panel on" id="p-dup">
+    <div class="hint">
+      <i class="ti ti-info-circle"></i>
+      <span>ชุด A (2 หลุม) + ชุด B (2 หลุม) → เฉลี่ย A&amp;B = ผลสุดท้าย พร้อม RPD และข้อความรายงาน</span>
+    </div>
+    <div id="dup-list"></div>
+    <button class="add-btn" onclick="addDup()">
+      <i class="ti ti-circle-plus"></i>เพิ่มตัวอย่าง Duplicate
+    </button>
+    <div class="space"></div>
+    <div class="sec-div"><i class="ti ti-chart-bar"></i>สรุปผล</div>
+    <div class="summary-grid">
+      <div class="sum-card tot"><div class="sum-icon"><i class="ti ti-test-pipe"></i></div><div><div class="sum-n" id="ds-tot">0</div><div class="sum-l">ทั้งหมด</div></div></div>
+      <div class="sum-card nd"><div class="sum-icon"><i class="ti ti-circle-check"></i></div><div><div class="sum-n" id="ds-nd">0</div><div class="sum-l">Not Detected</div></div></div>
+      <div class="sum-card lt"><div class="sum-icon"><i class="ti ti-alert-triangle"></i></div><div><div class="sum-n" id="ds-lt">0</div><div class="sum-l">Less Than</div></div></div>
+      <div class="sum-card dt"><div class="sum-icon"><i class="ti ti-alert-circle"></i></div><div><div class="sum-n" id="ds-dt">0</div><div class="sum-l">Detected</div></div></div>
+    </div>
+    <div class="btn-row">
+      <button class="clear-btn" onclick="clearAll('dup')">
+        <i class="ti ti-trash-x"></i>เคลียร์ข้อมูล
+      </button>
+      <button class="exp-btn" onclick="exportCSV('dup')">
+        <i class="ti ti-download"></i>Export CSV
+      </button>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<div class="toast" id="toast"><i class="ti ti-check"></i><span id="toast-msg"></span></div>
+
+<script>
+let sN=0,dN=0,cur='std';
+const $=id=>document.getElementById(id);
+const getLOD=()=>parseFloat($('g-lod').value)||3;
+const getLOQ=()=>parseFloat($('g-loq').value)||4;
+
+// ปัดทศนิยม 1 ตำแหน่ง (round half up)
+function r1(v){return Math.round(v*10)/10;}
+
+function calcRes(v){
+  if(v===null||isNaN(v))return null;
+  const lod=getLOD(),loq=getLOQ();
+  if(v<lod)return{t:'nd'};
+  if(v<loq)return{t:'lt'};
+  return{t:'dt',v};
+}
+
+function bdgHTML(r){
+  if(!r)return`<div class="rbdg e"><i class="ti ti-minus"></i><div class="rbdg-text"><div class="rbm">—</div><div class="rbs">รอค่า</div></div></div>`;
+  const loq=getLOQ();
+  if(r.t==='nd')return`<div class="rbdg nd"><i class="ti ti-circle-check"></i><div class="rbdg-text"><div class="rbm">Not Detected</div><div class="rbs">ตรวจไม่พบ</div></div></div>`;
+  if(r.t==='lt')return`<div class="rbdg lt"><i class="ti ti-alert-triangle"></i><div class="rbdg-text"><div class="rbm">Less Than</div><div class="rbs">${loq.toFixed(1)} ng/g</div></div></div>`;
+  return`<div class="rbdg dt"><i class="ti ti-alert-circle"></i><div class="rbdg-text"><div class="rbm">${r.v.toFixed(1)}</div><div class="rbs">ng/g · Detected</div></div></div>`;
+}
+
+function repHTML(r,avg){
+  const loq=getLOQ(),lod=getLOD();
+  if(!r)return`<div class="reprow"><div class="reptag"><i class="ti ti-clipboard-text"></i>ข้อความรายงาน</div><div class="repval e">รอกรอกค่าทั้ง 2 หลุม</div></div>`;
+  if(r.t==='nd')return`<div class="reprow"><div class="reptag"><i class="ti ti-clipboard-check"></i>ข้อความรายงาน</div><div class="repval">Not Detected</div><div class="repunit">รายงานว่าตรวจไม่พบ Aflatoxin (ต่ำกว่าค่า LOD = ${lod} ng/g)</div></div>`;
+  if(r.t==='lt')return`<div class="reprow"><div class="reptag"><i class="ti ti-clipboard-check"></i>ข้อความรายงาน</div><div class="repval">Less Than ${loq.toFixed(1)} ng/g</div><div class="repunit">รายงานว่าปริมาณ Aflatoxin น้อยกว่า ${loq.toFixed(1)} ng/g (ค่าอยู่ระหว่าง LOD–LOQ)</div></div>`;
+  return`<div class="reprow"><div class="reptag"><i class="ti ti-clipboard-check"></i>ข้อความรายงาน</div><div class="repval">${avg.toFixed(1)} ng/g</div><div class="repunit">รายงานค่าที่ได้จากการทดสอบ = ${avg.toFixed(1)} ng/g (${avg.toFixed(1)} ppb) — ค่าเกิน LOQ</div></div>`;
+}
+
+function addStd(){
+  if(sN>=10){toast('สูงสุด 10 ตัวอย่าง');return;}
+  sN++;const n=sN;
+  const d=document.createElement('div');d.className='sc';d.id='sc'+n;
+  d.innerHTML=`<div class="sc-bar">
+    <div class="sc-num">${String(n).padStart(2,'0')}</div>
+    <input class="sc-id" type="text" placeholder="รหัสตัวอย่าง เช่น ML26-013710-1" id="si${n}">
+    <button class="del" onclick="$('sc${n}').remove();updSum()" aria-label="ลบ"><i class="ti ti-trash"></i></button>
+  </div>
+  <div class="ww">
+    <div class="section-label"><i class="ti ti-droplets"></i>ค่าหลุม (ng/g)</div>
+    <div class="wr">
+      <div class="wb">
+        <label><i class="ti ti-circle-dot"></i>หลุม 1</label>
+        <input class="wi" type="number" step="0.01" inputmode="decimal" placeholder="—" id="sw1_${n}" oninput="this.classList.toggle('fill',this.value!='');cStd(${n})">
+      </div>
+      <div class="wplus"><i class="ti ti-plus" style="font-size:14px;color:var(--ink3);"></i></div>
+      <div class="wb">
+        <label><i class="ti ti-circle-dot"></i>หลุม 2</label>
+        <input class="wi" type="number" step="0.01" inputmode="decimal" placeholder="—" id="sw2_${n}" oninput="this.classList.toggle('fill',this.value!='');cStd(${n})">
+      </div>
+    </div>
+  </div>
+  <div class="rr">
+    <div class="avg-block">
+      <div class="avg-lbl"><i class="ti ti-math-function"></i>ค่าเฉลี่ย</div>
+      <div class="avg-val" id="savg${n}">—</div>
+    </div>
+    <div id="sbdg${n}">${bdgHTML(null)}</div>
+  </div>
+  <div id="srep${n}">${repHTML(null,0)}</div>`;
+  $('std-list').appendChild(d);updSum();
+}
+
+function cStd(n){
+  const w1=parseFloat($('sw1_'+n)?.value),w2=parseFloat($('sw2_'+n)?.value);
+  if(!isNaN(w1)&&!isNaN(w2)){
+    const avg=r1((w1+w2)/2);
+    $('savg'+n).textContent=avg.toFixed(1)+' ng/g';
+    const res=calcRes(avg);$('sbdg'+n).innerHTML=bdgHTML(res);$('srep'+n).innerHTML=repHTML(res,avg);
+  }else{
+    $('savg'+n).textContent='—';$('sbdg'+n).innerHTML=bdgHTML(null);$('srep'+n).innerHTML=repHTML(null,0);
+  }
+  updSum();
+}
+
+function abHalf(n,ab,LBL){
+  return`<div class="abh">
+    <div class="abhd"><div class="abpill ${ab}">${LBL}</div><span class="ablbl">ชุด ${LBL}</span></div>
+    <div class="abwells">
+      <div class="abw"><label>W1</label><input class="abwi" type="number" step="0.01" inputmode="decimal" placeholder="—" id="d${ab}1_${n}" oninput="this.classList.toggle('fill',this.value!='');cDup(${n})"></div>
+      <div class="wplus" style="padding-bottom:6px;"><i class="ti ti-plus" style="font-size:12px;color:var(--ink3);"></i></div>
+      <div class="abw"><label>W2</label><input class="abwi" type="number" step="0.01" inputmode="decimal" placeholder="—" id="d${ab}2_${n}" oninput="this.classList.toggle('fill',this.value!='');cDup(${n})"></div>
+    </div>
+    <div class="abavg">
+      <span class="abavgl"><i class="ti ti-math-function"></i>เฉลี่ย ${LBL}</span>
+      <span class="abavgv" id="davg${ab}${n}">—</span>
+    </div>
+  </div>`;
+}
+
+function addDup(){
+  if(dN>=10){toast('สูงสุด 10 ตัวอย่าง');return;}
+  dN++;const n=dN;
+  const d=document.createElement('div');d.className='dc';d.id='dc'+n;
+  d.innerHTML=`<div class="dc-bar">
+    <div class="sc-num">${String(n).padStart(2,'0')}</div>
+    <input class="sc-id" type="text" placeholder="รหัสตัวอย่าง" id="di${n}">
+    <div class="dtag"><i class="ti ti-copy"></i>DUP</div>
+    <button class="del" onclick="$('dc${n}').remove();updSum()" aria-label="ลบ"><i class="ti ti-trash"></i></button>
+  </div>
+  <div class="ab-wrap">${abHalf(n,'a','A')}${abHalf(n,'b','B')}</div>
+  <div class="dfinal">
+    <div>
+      <div class="dfl"><i class="ti ti-star"></i>ผลสุดท้าย (เฉลี่ย A+B)</div>
+      <div class="dfv" id="dfv${n}">—</div>
+    </div>
+    <div id="dbdg${n}">${bdgHTML(null)}</div>
+  </div>
+  <div id="drep${n}">${repHTML(null,0)}</div>
+  <div class="qc-bar" id="drpd-wrap${n}">
+    <div class="qc-label"><i class="ti ti-shield-check"></i>QC · RPD = |A−B| / mean × 100</div>
+    <div class="rpdc na" id="drpd${n}"><div class="rpdd"></div><span id="drpdv${n}">—</span></div>
+  </div>`;
+  $('dup-list').appendChild(d);updSum();
+}
+
+function cDup(n){
+  const a1=parseFloat($('da1_'+n)?.value),a2=parseFloat($('da2_'+n)?.value);
+  const b1=parseFloat($('db1_'+n)?.value),b2=parseFloat($('db2_'+n)?.value);
+  const hasA=!isNaN(a1)&&!isNaN(a2),hasB=!isNaN(b1)&&!isNaN(b2);
+  // ปัด 1 ตำแหน่งทุกขั้น
+  const avgA=hasA?r1((a1+a2)/2):null;
+  const avgB=hasB?r1((b1+b2)/2):null;
+  $('davga'+n).textContent=avgA!==null?avgA.toFixed(1)+' ng/g':'—';
+  $('davgb'+n).textContent=avgB!==null?avgB.toFixed(1)+' ng/g':'—';
+  if(avgA!==null&&avgB!==null){
+    const fin=r1((avgA+avgB)/2);
+    $('dfv'+n).textContent=fin.toFixed(1)+' ng/g';
+    const res=calcRes(fin);$('dbdg'+n).innerHTML=bdgHTML(res);$('drep'+n).innerHTML=repHTML(res,fin);
+    const rpd=(avgA+avgB)/2>0?Math.abs(avgA-avgB)/((avgA+avgB)/2)*100:0;
+    // ตารางที่ 2: เกณฑ์ RPD ตามความเข้มข้น
+    const thr = fin<=10?21 : fin<=20?19 : fin<=30?18 : fin<=40?17 : 15;
+    const pass=rpd<=thr;
+    $('drpdv'+n).textContent=r1(rpd).toFixed(1)+'% '+(pass?'✓ ผ่าน (≤'+thr+'%)':'✗ เกิน (>'+thr+'%)');
+    $('drpd'+n).className='rpdc '+(pass?'ok':'fail');
+  }else{
+    $('dfv'+n).textContent='—';$('dbdg'+n).innerHTML=bdgHTML(null);$('drep'+n).innerHTML=repHTML(null,0);
+    $('drpdv'+n).textContent='—';$('drpd'+n).className='rpdc na';
+  }
+  updSum();
+}
+
+function recalcAll(){
+  for(let i=1;i<=sN;i++)if($('sc'+i))cStd(i);
+  for(let i=1;i<=dN;i++)if($('dc'+i))cDup(i);
+}
+
+function updSum(){
+  let st=0,snd=0,slt=0,sdt=0,dt=0,dnd=0,dlt=0,ddt=0;
+  for(let i=1;i<=sN;i++){
+    if(!$('sc'+i))continue;
+    const w1=parseFloat($('sw1_'+i)?.value),w2=parseFloat($('sw2_'+i)?.value);
+    if(!isNaN(w1)&&!isNaN(w2)){st++;const r=calcRes(r1((w1+w2)/2));if(r?.t==='nd')snd++;else if(r?.t==='lt')slt++;else sdt++;}
+  }
+  for(let i=1;i<=dN;i++){
+    if(!$('dc'+i))continue;
+    const a1=parseFloat($('da1_'+i)?.value),a2=parseFloat($('da2_'+i)?.value);
+    const b1=parseFloat($('db1_'+i)?.value),b2=parseFloat($('db2_'+i)?.value);
+    if(!isNaN(a1)&&!isNaN(a2)&&!isNaN(b1)&&!isNaN(b2)){dt++;const fin=r1((r1((a1+a2)/2)+r1((b1+b2)/2))/2);const r=calcRes(fin);if(r?.t==='nd')dnd++;else if(r?.t==='lt')dlt++;else ddt++;}
+  }
+  $('ss-tot').textContent=st;$('ss-nd').textContent=snd;$('ss-lt').textContent=slt;$('ss-dt').textContent=sdt;
+  $('ds-tot').textContent=dt;$('ds-nd').textContent=dnd;$('ds-lt').textContent=dlt;$('ds-dt').textContent=ddt;
+}
+
+function switchTab(t){
+  cur=t;
+  $('p-std').classList.toggle('on',t==='std');$('p-dup').classList.toggle('on',t==='dup');
+  $('tb-std').classList.toggle('on',t==='std');$('tb-dup').classList.toggle('on',t==='dup');
+}
+
+function exportCSV(mode){
+  let c='\ufeffType,No,Sample ID,W1,W2,Avg,Result,Report\n';
+  if(mode==='std'){
+    for(let i=1;i<=sN;i++){
+      if(!$('sc'+i))continue;
+      const id=$('si'+i)?.value||'',w1=$('sw1_'+i)?.value||'',w2=$('sw2_'+i)?.value||'';
+      const avg=$('savg'+i)?.textContent||'',rep=$('srep'+i)?.querySelector('.repval')?.textContent||'';
+      c+=`Standard,${i},"${id}",${w1},${w2},"${avg}","${rep}"\n`;
+    }
+  }else{
+    for(let i=1;i<=dN;i++){
+      if(!$('dc'+i))continue;
+      const id=$('di'+i)?.value||'';
+      const a1=$('da1_'+i)?.value||'',a2=$('da2_'+i)?.value||'';
+      const b1=$('db1_'+i)?.value||'',b2=$('db2_'+i)?.value||'';
+      const avgA=$('davga'+i)?.textContent||'',avgB=$('davgb'+i)?.textContent||'';
+      const fin=$('dfv'+i)?.textContent||'',rep=$('drep'+i)?.querySelector('.repval')?.textContent||'';
+      const rpd=$('drpdv'+i)?.textContent||'';
+      c+=`Dup-A,${i},"${id}",${a1},${a2},"${avgA}",,\nDup-B,${i},"${id}",${b1},${b2},"${avgB}",,RPD=${rpd}\nDup-Final,${i},"${id}",,,,"${fin}","${rep}"\n`;
+    }
+  }
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([c],{type:'text/csv;charset=utf-8;'}));
+  a.download='aflatoxin_'+mode+'_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();toast('Export สำเร็จ ✓');
+}
+
+function toast(m){
+  $('toast-msg').textContent=m;
+  const t=$('toast');t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500);
+}
+
+function adj(id,delta){
+  const el=document.getElementById(id);
+  const v=parseFloat(el.value)||0;
+  el.value=Math.max(0,Math.round((v+delta)*10)/10).toFixed(1);
+  recalcAll();
+}
+
+function clearAll(mode){
+  if(!confirm('ต้องการเคลียร์ข้อมูลทั้งหมดใน tab นี้?'))return;
+  if(mode==='std'){
+    document.getElementById('std-list').innerHTML='';
+    sN=0;
+    addStd();addStd();
+  }else{
+    document.getElementById('dup-list').innerHTML='';
+    dN=0;
+    addDup();
+  }
+  updSum();
+  toast('เคลียร์ข้อมูลแล้ว');
+}
+
+window.onload=()=>{addStd();addStd();addDup();cur='dup';};
+</script>
+</body>
+</html>
